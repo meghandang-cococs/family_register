@@ -111,7 +111,12 @@ async def select_classes(student_id: int, db: db_dependency, family: family_depe
 @router.get("/checkout/{family_id}")
 async def view_cart(db: db_dependency, family: family_dependency):
     current_year = datetime.now().year
-    cart = (db.query(Family).join(Student, Student.family_id == Family.family_id)).join(StudentClass, StudentClass.student_id == Student.student_id and StudentClass.wait == 0 and StudentClass.year == current_year)
+    cart = (((db.query(Family)
+            .join(Student, Student.family_id == Family.family_id))
+            .join(StudentClass, StudentClass.student_id == Student.student_id and StudentClass.wait == 0 and StudentClass.year == current_year))
+            .filter(StudentClass.paid == 0)
+            .filter(Family.family_id == family.get('family_id'))
+
 
 
 
