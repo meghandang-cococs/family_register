@@ -1,0 +1,94 @@
+from fastapi import APIRouter, HTTPException, status
+from datetime import datetime
+from pydantic import BaseModel
+from models import Student
+from .auth import db_dependency, family_dependency
+
+
+router = APIRouter(
+    prefix = '/family',
+    tags = ['student']
+)
+
+class CreateStudentRequest(BaseModel):
+    first_name: str
+    last_name: str
+    chinese_name: str
+    dob: str
+    gender: str
+    grade: str
+    email: str
+    medical_cond: str
+    allergy: str
+    doctor_name: str
+    doctor_phone: str
+    ins_company: str
+    ins_policy: str
+
+
+@router.post("/student", status_code = status.HTTP_201_CREATED)
+async def create_child(db: db_dependency, family: family_dependency, child_request: CreateStudentRequest):
+    if family is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
+    now = datetime.utcnow()
+    child_model = Student(
+        first_name = child_request.first_name,
+        last_name = child_request.last_name,
+        chinese_name = child_request.chinese_name,
+        gender = child_request.gender,
+        grade = child_request.grade,
+        dob = child_request.dob,
+        medical_cond = child_request.medical_cond,
+        allergy = child_request.allergy,
+        doctor_name = child_request.doctor_name,
+        doctor_phone = child_request.doctor_phone,
+        ins_company = child_request.ins_company,
+        ins_policy = child_request.ins_policy,
+        family_id = family.get('family_id'),
+        created = now,
+        modified = now,
+        status = 0,
+        email = child_request.email,
+        o_student_id = "string"
+    )
+    
+
+    db.add(child_model)
+    db.commit()
+
+
+@router.get("/student/{family_id}")
+async def get_students_by_family(family: family_dependency, db: db_dependency):
+    if family is None:
+        raise HTTPException(status_code=404, detail="Family not found")
+    return db.query(Student).filter(Student.family_id == family.get('family_id')).all()
+
+
+
+@router.put("/student/{student_id}", status_code = status.HTTP_200_OK)
+async def update_student_profile(db: db_dependency, student_id: int, child_request: CreateStudentRequest, family: family_dependency):
+    student = db.query(Student).filter(Student.student_id == student_id, Student.family_id == family.get('family_id')).first()
+    if student is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
+
+    profile_model = db.query(Student).filter(Student.student_id == student.get('student_id')).first()
+    if profile_model is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    profile_model.first_name = child_request.first_name,
+    profile_model.last_name = child_request.last_name,
+    profile_model.chinese_name = child_request.chinese_name,
+    profile_model.gender = child_request.gender,
+    profile_model.grade = child_request.grade,
+    profile_model.dob = child_request.dob,
+    profile_model.medical_cond = child_request.medical_cond,
+    profile_model.allergy = child_request.allergy,
+    profile_model.doctor_name = child_request.doctor_name,
+    profile_model.doctor_phone = child_request.doctor_phone,
+    profile_model.ins_company = child_request.ins_company,
+    profile_model.ins_policy = child_request.ins_policy
+    profile_model.email = child_request.email,
+
+    db.add(profile_model)
+    db.commit()
+
