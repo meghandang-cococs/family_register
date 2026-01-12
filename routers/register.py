@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 from pydantic import BaseModel
-from models import Student, StudentClass, CurrentClasses
+from models import Student, StudentClass, CurrentClasses, Family
 from .auth import db_dependency, family_dependency
 from sqlalchemy import func, case
 
@@ -66,16 +66,16 @@ async def read_classes_by_category(category_order: list, student_id: int, db: Se
 
     return final_data
 
-
+# From select_classes.php lines 69-76
 @router.get("/{student_id}/read_current_LC_classes")
 async def read_current_LC_classes(student_id: int, db: db_dependency, family: family_dependency):
     student = db.query(Student).filter(Student.student_id == student_id, Student.family_id == family.get('family_id')).first()
     verify_student(student)
     category_order = ['LC', 'CSL', 'AC', 'SP-FULL','SP-HALF','SP-EC','BOOK', 'SP-lang', 'SP-AC']
     return await read_classes_by_category(category_order, student_id, db)
-    
-    
-    
+
+
+# From select_classes.php lines 82-88
 @router.get("/{student_id}/read_current_EP_classes")
 async def read_current_EP_classes(student_id: int, db: db_dependency, family: family_dependency):
     student = db.query(Student).filter(Student.student_id == student_id, Student.family_id == family.get('family_id')).first()
@@ -107,9 +107,14 @@ async def select_classes(student_id: int, db: db_dependency, family: family_depe
     db.add(class_list)
     db.commit()
 
-
+# from checkout.php 53-72
 @router.get("/checkout/{family_id}")
 async def view_cart(db: db_dependency, family: family_dependency):
+    current_year = datetime.now().year
+    cart = (db.query(Family).join(Student, Student.family_id == Family.family_id)).join(StudentClass, StudentClass.student_id == Student.student_id and StudentClass.wait == 0 and StudentClass.year == current_year)
+
+
+
     current_year = datetime.now().year
 
     student_ids = [
