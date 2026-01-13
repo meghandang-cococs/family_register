@@ -107,29 +107,69 @@ async def select_classes(student_id: int, db: db_dependency, family: family_depe
     db.add(class_list)
     db.commit()
 
-# from checkout.php 53-72
-@router.get("/checkout/{family_id}")
+
+# From checkout.php lines 107-114
+@router.get("/checkout")
 async def view_cart(db: db_dependency, family: family_dependency):
     current_year = datetime.now().year
-    cart = (((db.query(Family)
-            .join(Student, Student.family_id == Family.family_id))
-            .join(StudentClass, StudentClass.student_id == Student.student_id and StudentClass.wait == 0 and StudentClass.year == current_year))
-            .filter(StudentClass.paid == 0)
-            .filter(Family.family_id == family.get('family_id'))
 
+    cart = (
+        db.query(
+            Family.verified.label("verified"),
+            Student.first_name.label("first_name"),
+            Student.last_name.label("last_name"),
+            Student.chinese_name.label("chinese_name"),
+            StudentClass,  # SC.*
+            Classes.class_id.label("class_id"),
+            Classes.title.label("title"),
+            Classes.chinese_title.label("chinese_title"),
+        )
+        .select_from(Family)
+        .join(Student, Student.family_id == Family.family_id)
+        .join(
+            StudentClass,
+            and_(
+                StudentClass.student_id == Student.student_id,
+                StudentClass.paid == 0,
+                StudentClass.wait == 0,
+                StudentClass.year == current_year,
+            ),
+        )
+        .join(Classes, Classes.class_id == StudentClass.class_id)
+        .filter(Family.family_id == family.get("family_id"))
+        .order_by(Student.dob, StudentClass.class_id)
+    )
 
+    results = cart.all()
 
+    final_data = []
 
-    current_year = datetime.now().year
+    for (
+        verified,
+        first_name,
+        last_name,
+        chinese_name,
+        sc_obj,
+        class_id,
+        title,
+        chinese_title,
+    ) in results:
 
-    student_ids = [
-        s.student_id
-        for s in db.query(Student.student_id)
-                   .filter(Student.family_id == family.get('family_id'))
-                   .all()
-    ]
-    
-    return db.query(StudentClass).filter(StudentClass.student_id.in_(student_ids),
-                                        StudentClass.paid == False,
-                                        StudentClass.wait == False,
-                                        StudentClass.year == current_year).all()
+        item = {
+            c.name: getattr(sc_obj, c.name)
+            for c in sc_obj.__table__.columns
+        }
+
+        item.update({
+            "verified": verified,
+            "first_name": first_name,
+            "last_name": last_name,
+            "chinese_name": chinese_name,
+            "class_id": class_id,
+            "title": title,
+            "chinese_title": chinese_title,
+        })
+
+        final_data.append(item)
+
+    return final_data
