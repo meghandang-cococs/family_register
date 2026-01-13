@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from datetime import datetime
 from pydantic import BaseModel
-from models import Student, StudentClass, CurrentClasses
+from models import Student, StudentClass, CurrentClasses, Family, Classes
 from .auth import db_dependency, family_dependency
 from sqlalchemy import func, case
 
@@ -109,32 +109,34 @@ async def select_classes(student_id: int, db: db_dependency, family: family_depe
     db.commit()
 
 
-@router.get("/checkout/{family_id}")
+@router.get("/checkout")
 async def view_cart(db: db_dependency, family: family_dependency):
     current_year = datetime.now().year
-    cart = (((db.query(Family)
-            .join(Student, Student.family_id == Family.family_id))
-            .join(StudentClass, StudentClass.student_id == Student.student_id and StudentClass.wait == 0 and StudentClass.year == current_year))
-            .filter(StudentClass.paid == 0)
-            .filter(Family.family_id == family.get('family_id'))
 
-
-
-
-    current_year = datetime.now().year
-    cart = (db.query(Family.verified.label("verified"),
-                    Student.first_name.label("first_name"),
-                    Student.last_name.label("last_name"),
-                    Student.chinese_name.label("chinese_name"),
-                    StudentClass,  
-                    Classes.class_id.label("class_id"),
-                    Classes.title.label("title"),
-                    Classes.chinese_title.label("chinese_title"))
+    cart = (
+        db.query(
+            Family.verified.label("verified"),
+            Student.first_name.label("first_name"),
+            Student.last_name.label("last_name"),
+            Student.chinese_name.label("chinese_name"),
+            StudentClass,  # SC.*
+            Classes.class_id.label("class_id"),
+            Classes.title.label("title"),
+            Classes.chinese_title.label("chinese_title"),
+        )
         .select_from(Family)
         .join(Student, Student.family_id == Family.family_id)
-        .join(StudentClass, and_(StudentClass.student_id == Student.student_id, StudentClass.paid == 0, StudentClass.wait == 0, StudentClass.year == current_year))
+        .join(
+            StudentClass,
+            and_(
+                StudentClass.student_id == Student.student_id,
+                StudentClass.paid == 0,
+                StudentClass.wait == 0,
+                StudentClass.year == current_year,
+            ),
+        )
         .join(Classes, Classes.class_id == StudentClass.class_id)
-        .filter(Family.family_id == family.get('family_id'))
+        .filter(Family.family_id == family.get("family_id"))
         .order_by(Student.dob, StudentClass.class_id)
     )
 
@@ -152,10 +154,12 @@ async def view_cart(db: db_dependency, family: family_dependency):
         title,
         chinese_title,
     ) in results:
+
         item = {
             c.name: getattr(sc_obj, c.name)
             for c in sc_obj.__table__.columns
         }
+
         item.update({
             "verified": verified,
             "first_name": first_name,
@@ -169,6 +173,7 @@ async def view_cart(db: db_dependency, family: family_dependency):
         final_data.append(item)
 
     return final_data
+
 
     
 
