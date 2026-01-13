@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from datetime import datetime
 from pydantic import BaseModel
-from models import Student, StudentClass, CurrentClasses, Family, Classes
+from models import Student, StudentClass, CurrentClasses
 from .auth import db_dependency, family_dependency
 from sqlalchemy import func, case
 
@@ -76,7 +76,7 @@ async def read_current_LC_classes(student_id: int, db: db_dependency, family: fa
     return await read_classes_by_category(category_order, student_id, db)
     
     
-# From select_classes2.php lines 82-88    
+    
 @router.get("/{student_id}/read_current_EP_classes")
 async def read_current_EP_classes(student_id: int, db: db_dependency, family: family_dependency):
     student = db.query(Student).filter(Student.student_id == student_id, Student.family_id == family.get('family_id')).first()
@@ -109,9 +109,18 @@ async def select_classes(student_id: int, db: db_dependency, family: family_depe
     db.commit()
 
 
-# from checkout.php lines 106-114
-@router.get("/checkout")
+@router.get("/checkout/{family_id}")
 async def view_cart(db: db_dependency, family: family_dependency):
+    current_year = datetime.now().year
+    cart = (((db.query(Family)
+            .join(Student, Student.family_id == Family.family_id))
+            .join(StudentClass, StudentClass.student_id == Student.student_id and StudentClass.wait == 0 and StudentClass.year == current_year))
+            .filter(StudentClass.paid == 0)
+            .filter(Family.family_id == family.get('family_id'))
+
+
+
+
     current_year = datetime.now().year
     cart = (db.query(Family.verified.label("verified"),
                     Student.first_name.label("first_name"),
