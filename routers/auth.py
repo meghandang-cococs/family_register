@@ -8,13 +8,16 @@ from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from models import Family
 
+
 router = APIRouter(
     tags = ['auth']
 )
 
+
 SECRET_KEY = 'bc74bb305941d6500df275cd41bb699f6cd81152c56291d03b909e6dca48d908'
 ALGORITHM = 'HS256'
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl = 'token')
+
 
 def get_db():
     db = SessionLocal()
@@ -22,6 +25,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 async def get_current_family(token: str = Depends(oauth2_bearer)):
     try:
@@ -36,13 +40,16 @@ async def get_current_family(token: str = Depends(oauth2_bearer)):
     except JWTError:
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)        
 
+
 db_dependency = Annotated[Session, Depends(get_db)]
 family_dependency = Annotated[dict, Depends(get_current_family)]
+
 
 class CreateFamilyRequest(BaseModel):
     email: str
     password: str
     check_password: str
+
 
 class Token(BaseModel):
     access_token: str
@@ -63,7 +70,6 @@ def create_access_token(email: str, family_id: int, expires_delta: timedelta):
     expires = datetime.now(timezone.utc) + expires_delta
     encode.update({'exp': expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
-
 
     
 @router.post("/token", response_model = Token)

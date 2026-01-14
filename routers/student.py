@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
+from sqlalchemy import desc
 from datetime import datetime
 from pydantic import BaseModel
 from models import Student
@@ -26,7 +27,16 @@ class CreateStudentRequest(BaseModel):
     ins_policy: str
 
 
-@router.post("/student", status_code = status.HTTP_201_CREATED)
+# From students.php lines 32-37 
+@router.get("/student")
+async def get_students_by_family(family: family_dependency, db: db_dependency):
+    if family is None:
+        raise HTTPException(status_code=404, detail="Family not found")
+    return db.query(Student).filter(Student.family_id == family.get('family_id')).order_by(Student.dob).all()
+
+
+# From add_student.php
+@router.post("/student/add", status_code = status.HTTP_201_CREATED)
 async def create_child(db: db_dependency, family: family_dependency, child_request: CreateStudentRequest):
     if family is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
@@ -56,15 +66,7 @@ async def create_child(db: db_dependency, family: family_dependency, child_reque
     db.add(child_model)
     db.commit()
 
-
-@router.get("/student/{family_id}")
-async def get_students_by_family(family: family_dependency, db: db_dependency):
-    if family is None:
-        raise HTTPException(status_code=404, detail="Family not found")
-    return db.query(Student).filter(Student.family_id == family.get('family_id')).all()
-
-
-
+# From edit_student.php lines 28-63
 @router.put("/student/{student_id}", status_code = status.HTTP_200_OK)
 async def update_student_profile(db: db_dependency, student_id: int, child_request: CreateStudentRequest, family: family_dependency):
     student = db.query(Student).filter(Student.student_id == student_id, Student.family_id == family.get('family_id')).first()

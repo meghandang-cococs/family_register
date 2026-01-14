@@ -76,7 +76,7 @@ async def read_current_LC_classes(student_id: int, db: db_dependency, family: fa
     return await read_classes_by_category(category_order, student_id, db)
     
     
-    
+# From select_classes2.php lines 82-88    
 @router.get("/{student_id}/read_current_EP_classes")
 async def read_current_EP_classes(student_id: int, db: db_dependency, family: family_dependency):
     student = db.query(Student).filter(Student.student_id == student_id, Student.family_id == family.get('family_id')).first()
@@ -85,8 +85,9 @@ async def read_current_EP_classes(student_id: int, db: db_dependency, family: fa
     return await read_classes_by_category(category_order, student_id, db)   
 
 
-# Endpoint used by with frontend checkboxes. Frontend sends the class as input. May change to using class_id as param instead of form
-# Frontend ensures there are no duplicated
+# From select_classes.php 
+# Simply asks for class_id and adds to StudentClass
+# Endpoint used by with frontend checkboxes. Frontend sends the class as input. Frontend ensures there are no duplicated
 @router.post("/{student_id}/select_classes")
 async def select_classes(student_id: int, db: db_dependency, family: family_dependency, register: StudentRegisterRequest):
     student = db.query(Student).filter(Student.student_id == student_id, Student.family_id == family.get('family_id')).first()
@@ -98,7 +99,7 @@ async def select_classes(student_id: int, db: db_dependency, family: family_depe
     class_list = StudentClass(
         year = current_year,
         student_id = student_id,
-        class_id = register.class_id,
+        class_id = register.class_id, # user input
         wait = 0,        
         paid = 0,      
         created = now,
@@ -107,6 +108,7 @@ async def select_classes(student_id: int, db: db_dependency, family: family_depe
 
     db.add(class_list)
     db.commit()
+
 
 # from checkout.php 53-72
 @router.get("/checkout/{family_id}")
@@ -119,7 +121,7 @@ async def view_cart(db: db_dependency, family: family_dependency):
             Student.first_name.label("first_name"),
             Student.last_name.label("last_name"),
             Student.chinese_name.label("chinese_name"),
-            StudentClass,  # SC.*
+            StudentClass,  
             Classes.class_id.label("class_id"),
             Classes.title.label("title"),
             Classes.chinese_title.label("chinese_title"),
@@ -173,14 +175,6 @@ async def view_cart(db: db_dependency, family: family_dependency):
         final_data.append(item)
 
     return final_data
-
-
-    
-
-    
-    
-    
-
 
 
 

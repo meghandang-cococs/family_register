@@ -11,6 +11,11 @@ router = APIRouter(
     tags = ['family']
 )
 
+class InitialFamilyRequest(BaseModel):
+    email: str
+    password: str           # for now, not hashed until we can implement OAuth
+    check_password: str
+
 class CreateFamilyRequest(BaseModel):
     email: str
     father_fname: str
@@ -46,9 +51,9 @@ class NewPasswordCheck(BaseModel):
     password: str = Field(min_length=6, max_length=64)
     new_password: str = Field(min_length = 6, max_length=64)
 
-
-@router.post("/profile", status_code=status.HTTP_201_CREATED)
-async def initial_family_signup(db: db_dependency, req: CreateFamilyRequest):
+# From signup.php lines 300-335 roughly
+@router.post("/profile/create", status_code=status.HTTP_201_CREATED)
+async def initial_family_signup(db: db_dependency, req: InitialFamilyRequest):
     if req.password != req.check_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -63,6 +68,8 @@ async def initial_family_signup(db: db_dependency, req: CreateFamilyRequest):
         )
 
     now = datetime.utcnow()
+
+    # creating the family profile, generalizing all other fields to be completed later
     new_family = Family(
         email=req.email,
         password= req.password,
@@ -119,14 +126,15 @@ async def initial_family_signup(db: db_dependency, req: CreateFamilyRequest):
     db.refresh(new_family)
     return {"family_id": new_family.family_id}
 
-
+# From profile.php lines 26-44
 @router.get("/profile/view")
 async def get_family(family: family_dependency, db: db_dependency):
     if family is None:
         raise HTTPException(status_code=404, detail="Family not found")
     return db.query(Family).filter(Family.family_id == family.get('family_id')).first()
 
-# from edit_profile.php
+
+# From edit_profile.php
 @router.put("/profile/edit", status_code = status.HTTP_200_OK)
 async def update_family_profile(db: db_dependency, family: family_dependency, profile_change: CreateFamilyRequest):
     if family is None:
