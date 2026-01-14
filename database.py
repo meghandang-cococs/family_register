@@ -3,11 +3,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 
 
-SQLALCHEMY_DATABASE_URL = 'mysql+pymysql://cococs:1234@127.0.0.1:3306/cococs' 
+DATABASE_URL = 'mysql+pymysql://cococs:1234@127.0.0.1:3306/cococs' 
 #SQLALCHEMY_DATABASE_URL = 'sqlite:///./cococs.db'
 
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL) #, connect_args = {'check_same_thread': False}
+engine = create_engine( DATABASE_URL) #, connect_args = {'check_same_thread': False}
 SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = engine)
 
 Base = declarative_base()

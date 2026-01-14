@@ -108,7 +108,7 @@ async def select_classes(student_id: int, db: db_dependency, family: family_depe
     db.add(class_list)
     db.commit()
 
-
+# From checkout.php lines 107-114
 @router.get("/checkout")
 async def view_cart(db: db_dependency, family: family_dependency):
     current_year = datetime.now().year
