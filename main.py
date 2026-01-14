@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from models import *
 from database import engine, SessionLocal
-from routers import auth, family, student, register, admin
+from routers import auth, family, student, register, admin, payments
 
 
 app = FastAPI()
@@ -14,6 +14,7 @@ app.include_router(family.router)
 app.include_router(student.router)
 app.include_router(register.router)
 app.include_router(admin.router)
+app.include_router(payments.router)
 
 
 

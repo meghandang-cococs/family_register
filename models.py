@@ -2,6 +2,49 @@ from database import Base
 from sqlalchemy import Column, Integer, Numeric, String, Boolean, ForeignKey, SmallInteger, DateTime, Text
 from datetime import datetime
 
+
+class Classes(Base):
+    __tablename__ = "classes"
+    class_id = Column(Integer, primary_key=True, index=True)
+
+    class_code = Column(String(10), nullable=False)
+    category = Column(String(10), nullable=False)
+
+    title = Column(String(100), nullable=False)
+    description = Column(Text, nullable=False)
+
+    chinese_title = Column(String(100), nullable=False)
+    chinese_description = Column(String(100), nullable=False)
+
+    age = Column(SmallInteger, nullable=False)
+
+    created = Column(DateTime, nullable=False, default=datetime.utcnow)
+    modified = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+    seats_x = Column(SmallInteger, nullable=False)
+    weight = Column(Integer, nullable=False)
+
+
+class CurrentClasses(Base):
+    __tablename__ = "current_classes"
+
+    year = Column(Integer)
+    class_id = Column(Integer, primary_key=True) 
+
+    category = Column(String(10))
+    weight = Column(Integer)
+
+    title = Column(String(100))
+    description = Column(Text)             
+    chinese_title = Column(String(100))
+    chinese_description = Column(String(100))
+
+
 class Family(Base):
     __tablename__ = "families"
 
@@ -65,6 +108,16 @@ class Family(Base):
     referral = Column(String(80), nullable=False, default=" ")
 
 
+class FamilyYear(Base):
+    __tablename__ = "family_year"
+
+    year = Column(Integer, primary_key=True, nullable=False)
+    family_id = Column(Integer, primary_key=True, nullable=False, default=0)
+
+    paid = Column(Boolean, nullable=True)   # tinyint(1)
+    vay_id = Column(Integer, nullable=True)    
+
+
 class Student(Base):
     __tablename__ = "students"
 
@@ -96,45 +149,6 @@ class Student(Base):
     ins_company = Column(String(40), nullable=False)
     ins_policy = Column(String(40), nullable=False)
 
-class Classes(Base):
-    __tablename__ = "classes"
-    class_id = Column(Integer, primary_key=True, index=True)
-
-    class_code = Column(String(10), nullable=False)
-    category = Column(String(10), nullable=False)
-
-    title = Column(String(100), nullable=False)
-    description = Column(Text, nullable=False)
-
-    chinese_title = Column(String(100), nullable=False)
-    chinese_description = Column(String(100), nullable=False)
-
-    age = Column(SmallInteger, nullable=False)
-
-    created = Column(DateTime, nullable=False, default=datetime.utcnow)
-    modified = Column(
-        DateTime,
-        nullable=False,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
-    )
-
-    seats_x = Column(SmallInteger, nullable=False)
-    weight = Column(Integer, nullable=False)
-
-class CurrentClasses(Base):
-    __tablename__ = "current_classes"
-
-    year = Column(Integer)
-    class_id = Column(Integer, primary_key=True) 
-
-    category = Column(String(10))
-    weight = Column(Integer)
-
-    title = Column(String(100))
-    description = Column(Text)             
-    chinese_title = Column(String(100))
-    chinese_description = Column(String(100))
 
 class StudentClass(Base):
     __tablename__ = "student_class"
@@ -151,7 +165,8 @@ class StudentClass(Base):
     paid_price = Column(Integer, nullable=True)
 
     created = Column(DateTime, nullable=False)
-    removed = Column(DateTime, nullable=False)
+    removed = Column(DateTime, nullable=False)    
+
 
 class Order(Base):
     __tablename__ = "orders"

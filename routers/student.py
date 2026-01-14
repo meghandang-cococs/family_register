@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import desc
 from datetime import datetime
 from pydantic import BaseModel
-from models import Student
+from models import Student, StudentClass, Classes
 from .auth import db_dependency, family_dependency
 
 
@@ -73,7 +73,7 @@ async def update_student_profile(db: db_dependency, student_id: int, child_reque
     if student is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
 
-    profile_model = db.query(Student).filter(Student.student_id == student.get('student_id')).first()
+    profile_model = db.query(Student).filter(Student.student_id == student_id).first()
     if profile_model is None:
         raise HTTPException(status_code=404, detail="Not Found")
 
@@ -93,4 +93,32 @@ async def update_student_profile(db: db_dependency, student_id: int, child_reque
 
     db.add(profile_model)
     db.commit()
+
+
+# From edit_student.php lines 65-70
+@router.get("/student/{student_id}/registration_history", status_code = status.HTTP_200_OK)
+async def view_student_history(db: db_dependency, student_id: int, family: family_dependency):
+    student = db.query(Student).filter(Student.student_id == student_id, Student.family_id == family.get('family_id')).first()
+    if student is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
+    
+    history = (
+        db.query(StudentClass, StudentClass.year, Classes.class_code, Classes.title, Classes.chinese_title)
+        .join(Classes, Classes.class_id == StudentClass.class_id)
+        .filter(StudentClass.student_id == student_id)
+        .filter(StudentClass.paid != 0)
+    )
+
+    results = history.all()
+    final_history = []
+    for row in results:
+        item = {
+            "year": row.year,
+            "class_code": row.class_code,
+            "title": row.title,
+            "chinese_title": row.chinese_title
+        }
+        final_history.append(item)
+
+    return final_history
 
