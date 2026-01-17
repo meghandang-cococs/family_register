@@ -26,7 +26,7 @@ router = APIRouter(
 )
 
 
-SECRET_KEY = 'bc74bb305941d6500df275cd41bb699f6cd81152c56291d03b909e6dca48d908'
+SECRET_KEY = 'bc74bb305941d6500df275cd41bb699f6cd81152c56291d03b909e6dca48d908'   # change this
 ALGORITHM = 'HS256'
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl = 'token')
 
@@ -235,7 +235,7 @@ oauth.register(
 
 @router.get("/login/yahoo")
 async def login_yh(request: Request):
-    redirect_uri = "https://cococs.org/family"   # temporary. yahoo only takes https for redirect url, so i could not route it to /auth/yahoo
+    redirect_uri = "https://somesite.com"   # temporary. yahoo only takes https for redirect url, so i could not route it to /auth/yahoo
     print("YAHOO redirect_uri:", redirect_uri)
     print("YAHOO client_id:", CLIENT_ID)
     return await oauth.yahoo.authorize_redirect(request, redirect_uri)
