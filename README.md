@@ -1,4 +1,4 @@
-# Contra Costa Chinese School Registration System (FastAPI Backend)
+# School Registration System (FastAPI Backend)
 
 ## Overview 
 This project modernizes a legacy PHP-based school registration system by migrating it to a FastAPI, API-first backend. The original system (circa 2013) tightly coupled backend SQL logic with a server-rendered frontend, making it difficult to scale, maintain, or support modern clients.
