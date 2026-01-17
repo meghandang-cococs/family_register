@@ -12,10 +12,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 
 if os.environ.get('TESTING') == '1':
-    DATABASE_URL = 'sqlite:///./test.db'
+    DATABASE_URL = 'sqlite:///./test.db' 
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:
-    DATABASE_URL = 'mysql+pymysql://cococs:1234@127.0.0.1:3306/cococs'
+    DATABASE_URL = 'mysql+pymysql://test' # connect database
     engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = engine)
