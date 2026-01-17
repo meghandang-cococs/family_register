@@ -30,6 +30,10 @@ The system is used by 300+ families for student registration, class enrollment, 
     - Payment history
     - Volunteer activity records
 
+### Authentication (Google, Facebook, Yahoo)
+- Log in with third-party authorization so that no passwords are stored
+- Verify user identity
+
 ## System Architecture
 - Backend Framework: FastAPI (Python)
 - Database: Existing SQL database (accessed via phpMyAdmin)
