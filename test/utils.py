@@ -1,3 +1,11 @@
+"""
+Filename: utils.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Utilities for unit testing. Overriding functions and creating testing models
+"""
+
 from sqlalchemy import create_engine, text
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
@@ -8,7 +16,7 @@ from datetime import datetime
 import pytest
 from app.models import Classes, CurrentClasses, Family, FamilyYear, Student, StudentClass, Order, OrderStudentClass, VolunteerActivities, VolunteerActivityYear
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./testdb.db"
+SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -82,6 +90,7 @@ def test_current_classes_1():
         connection.execute(text("DELETE FROM current_classes;"))
         connection.commit()
 
+
 @pytest.fixture
 def test_current_classes_2():
     test_class_2 = CurrentClasses(
@@ -108,6 +117,7 @@ def test_current_classes_2():
 @pytest.fixture
 def test_family():
     family = Family(
+        family_id="1",
         email = "test1@e.com",
         password = "1234",
         o_family_id = "",
@@ -212,7 +222,7 @@ def test_student():
 
 
 @pytest.fixture
-def test_student_class():
+def test_student_class_unpaid():
     test_student_class = StudentClass(
         year = 2026,
         student_id = 1,
@@ -231,6 +241,25 @@ def test_student_class():
         connection.execute(text("DELETE FROM student_class;"))
         connection.commit()
 
+@pytest.fixture
+def test_student_class_paid():
+    test_student_class = StudentClass(
+        year = 2026,
+        student_id = 1,
+        class_id = 1,
+        wait = False,        
+        paid = True,        
+        paid_price = 0,
+        created = now,
+        removed = now
+    )
+    db = TestingSessionLocal()
+    db.add(test_student_class)
+    db.commit()
+    yield test_student_class
+    with engine.connect() as connection:
+        connection.execute(text("DELETE FROM student_class;"))
+        connection.commit()
 
 @pytest.fixture
 def test_order():
@@ -264,7 +293,7 @@ def test_order_paid():
         canceled = None,
         amount = 1.00,
         payment_method = "card",
-        transaction_id = "123456"
+        transaction_id = "1234567"
     )
     db = TestingSessionLocal()
     db.add(order)

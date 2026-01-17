@@ -1,3 +1,11 @@
+"""
+Filename: models.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Models for tables in database
+"""
+
 from .database import Base
 from sqlalchemy import Column, Integer, Numeric, String, Boolean, ForeignKey, SmallInteger, DateTime, Text
 from datetime import datetime

@@ -1,7 +1,15 @@
+"""
+Filename: family.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Endpoints handling Family object creation, update, and getting.
+"""
+
 from fastapi import APIRouter,HTTPException, status
 from datetime import datetime
 from pydantic import BaseModel, Field
-from ..models import Family, VolunteerActivities, VolunteerActivityYear, FamilyYear, UserInfo
+from ..models import Family, VolunteerActivities, VolunteerActivityYear, FamilyYear     # Later include UserInfo to connect with OAuth
 from .auth import db_dependency, family_dependency
 
 
@@ -65,9 +73,7 @@ async def initial_family_signup(db: db_dependency, req: InitialFamilyRequest):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
         )
-    
-    query = db.query(UserInfo).filter(UserInfo.email == req.email).first()
-    query.profile_created = True
+
 
     now = datetime.utcnow()
 

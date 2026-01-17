@@ -1,3 +1,11 @@
+"""
+Filename: admin.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Endpoints for reading all families and students, will not be needed in actual app
+"""
+
 from fastapi import APIRouter
 from ..models import Student, Family
 from .auth import db_dependency

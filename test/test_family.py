@@ -1,3 +1,11 @@
+"""
+Filename: test_family.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Unit tests for family.py
+"""
+
 from .utils import *
 from app.routers.auth import get_db, get_current_family
 from fastapi import status
@@ -84,6 +92,5 @@ def test_update_family(test_family):
             "doctor_phone": "",
             "ins_company": "",
             "ins_policy": ""
-        },
-    )
+        })
     assert response.status_code == status.HTTP_200_OK

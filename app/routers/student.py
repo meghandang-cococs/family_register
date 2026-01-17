@@ -1,3 +1,11 @@
+"""
+Filename: student.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Endpoints handling Student object creation, update, and getting.
+"""
+
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import desc
 from datetime import datetime
@@ -77,19 +85,19 @@ async def update_student_profile(db: db_dependency, student_id: int, child_reque
     if profile_model is None:
         raise HTTPException(status_code=404, detail="Not Found")
 
-    profile_model.first_name = child_request.first_name,
-    profile_model.last_name = child_request.last_name,
-    profile_model.chinese_name = child_request.chinese_name,
-    profile_model.gender = child_request.gender,
-    profile_model.grade = child_request.grade,
-    profile_model.dob = child_request.dob,
-    profile_model.medical_cond = child_request.medical_cond,
-    profile_model.allergy = child_request.allergy,
-    profile_model.doctor_name = child_request.doctor_name,
-    profile_model.doctor_phone = child_request.doctor_phone,
-    profile_model.ins_company = child_request.ins_company,
+    profile_model.first_name = child_request.first_name
+    profile_model.last_name = child_request.last_name
+    profile_model.chinese_name = child_request.chinese_name
+    profile_model.gender = child_request.gender
+    profile_model.grade = child_request.grade
+    profile_model.dob = child_request.dob
+    profile_model.medical_cond = child_request.medical_cond
+    profile_model.allergy = child_request.allergy
+    profile_model.doctor_name = child_request.doctor_name
+    profile_model.doctor_phone = child_request.doctor_phone
+    profile_model.ins_company = child_request.ins_company
     profile_model.ins_policy = child_request.ins_policy
-    profile_model.email = child_request.email,
+    profile_model.email = child_request.email
 
     db.add(profile_model)
     db.commit()

@@ -7,6 +7,8 @@ The new backend cleanly separates concerns and provides a reusable REST API that
 
 The system is used by 300+ families for student registration, class enrollment, payments, and volunteer tracking.
 
+!! Has not been published for public use !!
+
 ## Core Features 
 ### Family & Account Management  
 - Supports existing families and new family onboarding.  

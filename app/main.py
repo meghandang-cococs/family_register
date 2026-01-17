@@ -1,3 +1,11 @@
+"""
+Filename: main.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Main entry point, registers routers
+"""
+
 
 from fastapi import FastAPI
 from .models import *

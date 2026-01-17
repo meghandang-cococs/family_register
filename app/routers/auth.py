@@ -1,3 +1,11 @@
+"""
+Filename: auth.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Authentication, session, third-party OAuth (Google, Facebook, Yahoo)
+"""
+
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone

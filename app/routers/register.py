@@ -1,9 +1,16 @@
+"""
+Filename: register.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Endpoints points handling student registration, current class viewing
+"""
+
 from fastapi import APIRouter, HTTPException, status
-from sqlalchemy.orm import Session
-from sqlalchemy import and_
+from sqlalchemy.orm import Session 
 from datetime import datetime
 from pydantic import BaseModel
-from ..models import Student, StudentClass, CurrentClasses, Family, Classes
+from ..models import Student, StudentClass, CurrentClasses
 from .auth import db_dependency, family_dependency
 from sqlalchemy import func, case
 

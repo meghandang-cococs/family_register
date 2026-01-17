@@ -1,3 +1,11 @@
+"""
+Filename: test_main.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Unit tests for main.py
+"""
+
 from fastapi.testclient import TestClient
 from app.main import app
 from fastapi import status

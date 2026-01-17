@@ -1,7 +1,15 @@
+"""
+Filename: payments.py
+Author: Meghan Dang
+Date: 2025-01-16
+Version: 1.0
+Description: Endpoints points handling Order viewing
+"""
+
 from fastapi import APIRouter,HTTPException, status
 from datetime import datetime
 from sqlalchemy import func, desc, and_
-from ..models import Family, Order, OrderStudentClass, StudentClass, Student, Classes, VolunteerActivities, VolunteerActivityYear, FamilyYear
+from ..models import Family, Order, OrderStudentClass, StudentClass, Student, Classes, VolunteerActivities, VolunteerActivityYear
 from .auth import db_dependency, family_dependency
 
 
